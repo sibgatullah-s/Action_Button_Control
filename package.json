@@ -23,17 +23,37 @@
     "requirejs": "^2.3.2",
     "typescript": "^2.9.2",
     "typings": "^2.1.1",
-    "vss-web-extension-sdk": "^5.141.0"
+    "vss-web-extension-sdk": "^5.141.0",
+    "webpack-cli": "^3.3.11"
   },
   "name": "action-button-control",
   "private": false,
   "version": "1.1.0",
   "scripts": {
-    "postinstall": "typings install"
+    "dev:webpack": "webpack --watch",
+    "dev": "webpack-dev-server --hot --progress --colors --content-base ./ --https --port 7777",
+    "dev:http": "webpack-dev-server --progress --colors --content-base ./ --port 7777",
+    "postinstall": "typings install",
+    "build": "npm run lint && npm run clean && npm run webpack",
+    "clean": "rimraf ./dist && rimraf ./*.vsix",
+    "gallery-publish": "npm run build && tfx extension publish --rev-version --token kxpeg5dnopik2tfoy6pb3jvyclbhdsarseqylnxfezvxjetlwyaa",
+    "lint": "tslint -c tslint.json 'src/*.ts'",
+    "package": "tfx extension create  --rev-version",
+    "postbuilddemo": "npm run package",
+    "webpack": "webpack --progress --colors --config webpack.config.js --output-path ./dist -p",
+    "compiletests": "tsc ./tests/CountdownCalculatorSpec.ts --lib es6,es5,dom",
+    "runtests": "jasmine-node --test-dir ./tests --verbose --junitreport --output ./reportTests/",
+    "runcovertests": "istanbul cover --hook-run-in-context --report cobertura --report html node_modules/jasmine-node/bin/jasmine-node --test-dir ./tests --verbose --junitreport --output ./reportTests/",
+    "inlinesource": "gulp inlinesource",
+    "pretest": "rimraf ./reportTests && rimraf ./coverage",
+    "test": "npm run compiletests && npm run runtests && npm run runcovertests",
+    "posttest": "npm run inlinesource"
   },
   "dependencies": {
     "@types/node": "^13.7.7",
     "azure-devops-node-api": "^10.1.0",
-    "http-proxy-agent": "^4.0.1"
+    "http-proxy-agent": "^4.0.1",
+    "init": "^0.1.2",
+    "yarn": "^1.22.4"
   }
 }
